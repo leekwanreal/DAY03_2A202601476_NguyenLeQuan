@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trợ Lý Tra Cứu Đơn Hàng & Đổi Trả AI Agent</title>
+    <!-- Google Fonts Inter & Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR CONTAINER -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>CSKH AI Agent</h2>
+                    <span>Tra cứu đơn hàng & Đổi trả</span>
+                </div>
+            </div>
+
+            <!-- MODEL & MODE CONTROLS -->
+            <div class="control-card">
+                <div class="card-title">
+                    <i class="fa-solid fa-sliders"></i> Cấu hình Agent
+                </div>
+
+                <div class="form-group">
+                    <label for="modeSelect"><i class="fa-solid fa-brain"></i> Chế độ Agent:</label>
+                    <select id="modeSelect">
+                        <option value="react" selected>⚡ ReAct Agent (Tool & Trace)</option>
+                        <option value="baseline">💬 Baseline Chatbot (Không Tool)</option>
+                        <option value="autonomous">🚀 Autonomous Goal Agent</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="providerSelect"><i class="fa-solid fa-plug"></i> LLM Provider:</label>
+                    <select id="providerSelect">
+                        <option value="mock" selected>🛠️ Offline Mock Mode</option>
+                        <option value="gemini">✨ Google Gemini 2.5</option>
+                        <option value="openai">🟢 OpenAI GPT-4o Mini</option>
+                        <option value="anthropic">🟠 Anthropic Claude 3.5</option>
+                        <option value="openrouter">🌐 OpenRouter API</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- QUICK DEMO TEST CASES -->
+            <div class="control-card">
+                <div class="card-title">
+                    <i class="fa-solid fa-vial"></i> Test Cases mẫu (Role 1)
+                </div>
+                <div class="test-prompts-list" id="testPromptsList">
+                    <button class="test-btn"
+                        onclick="usePrompt('Chính sách đổi trả hàng chung của cửa hàng bao gồm những quy định và điều kiện gì?')">
+                        <i class="fa-solid fa-book"></i> Hỏi chính sách đổi trả
+                    </button>
+                    <button class="test-btn"
+                        onclick="usePrompt('Tra cứu đơn hàng mã DH1001 và kiểm tra xem có được đổi trả không?')">
+                        <i class="fa-solid fa-magnifying-glass"></i> Tra cứu DH1001 & Đổi trả
+                    </button>
+                    <button class="test-btn" onclick="usePrompt('Kiểm tra các đơn hàng đã mua bằng SĐT 0901234567.')">
+                        <i class="fa-solid fa-phone"></i> Tra cứu theo SĐT 0901234567
+                    </button>
+                    <button class="test-btn warning"
+                        onclick="usePrompt('Tra cứu đơn hàng mã DH1002 và tạo yêu cầu đổi trả.')">
+                        <i class="fa-solid fa-clock-rotate-left"></i> Đơn DH1002 (Đã quá 7 ngày)
+                    </button>
+                    <button class="test-btn danger"
+                        onclick="usePrompt('Tra cứu đơn hàng INVALID_99999 và đổi trả gấp.')">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Đơn không tồn tại (Edge Case)
+                    </button>
+                </div>
+            </div>
+
+            <!-- DATABASE SNAPSHOT -->
+            <div class="control-card db-card">
+                <div class="card-title">
+                    <i class="fa-solid fa-database"></i> Cơ sở dữ liệu mẫu (Mock DB)
+                </div>
+                <div class="db-items" id="dbItemsList">
+                    <div class="db-item">
+                        <span class="badge success">DH1001</span> SĐT: 0901234567 - 350K (Đã giao 8 ngày)
+                    </div>
+                    <div class="db-item">
+                        <span class="badge warning">DH1002</span> SĐT: 0901234567 - 850K (Quá 30 ngày)
+                    </div>
+                    <div class="db-item">
+                        <span class="badge info">DH1003</span> SĐT: 0988888888 - 1.2M (Đang giao)
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CHAT & DASHBOARD AREA -->
+        <main class="main-content">
+            <!-- CHAT HEADER -->
+            <header class="chat-header">
+                <div class="header-status">
+                    <span class="status-dot"></span>
+                    <div>
+                        <h3>Hệ thống Tra cứu CSKH e-Commerce</h3>
+                        <p id="currentModeLabel">Chế độ: ReAct Agent (Thought ➔ Action ➔ Observation)</p>
+                    </div>
+                </div>
+                <button class="clear-btn" onclick="clearChat()">
+                    <i class="fa-solid fa-trash-can"></i> Xóa lịch sử
+                </button>
+            </header>
+
+            <!-- CHAT MESSAGES DISPLAY -->
+            <div class="chat-messages" id="chatMessages">
+                <!-- Welcome Message -->
+                <div class="message system-msg">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="msg-content">
+                        <h4>Xin chào! Tôi là Trợ Lý CSKH AI Tra Cứu Đơn Hàng & Đổi Trả 📦</h4>
+                        <p>Tôi có thể giúp bạn:</p>
+                        <ul>
+                            <li><strong>Tra cứu trạng thái đơn hàng:</strong> Nhập Mã đơn hàng (ví dụ:
+                                <code>DH1001</code>) hoặc Số điện thoại.
+                            </li>
+                            <li><strong>Tư vấn đổi trả:</strong> Kiểm tra điều kiện đổi trả trong 7 ngày và tạo phiếu
+                                đổi trả tự động.</li>
+                            <li><strong>Hỗ trợ ReAct Trace:</strong> Hiển thị minh bạch từng bước Suy luận (Thought) ➔
+                                Hành động gọi Tool (Action) ➔ Kết quả (Observation).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAT INPUT BAR -->
+            <div class="chat-input-area">
+                <form id="chatForm" onsubmit="handleSend(event)">
+                    <div class="input-wrapper">
+                        <input type="text" id="userInput"
+                            placeholder="Nhập câu hỏi hoặc Mã đơn hàng (ví dụ: Tra cứu đơn DH1001)..."
+                            autocomplete="off" required>
+                        <button type="submit" id="sendBtn">
+                            <span>Gửi</span> <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="input-footer">
+                    <span><i class="fa-solid fa-shield-halved"></i> Tự động kích hoạt Phanh An Toàn (Guardrails Max 3
+                        bước)</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- APP JAVASCRIPT -->
+    <script src="app.js"></script>
+</body>
+
+</html>

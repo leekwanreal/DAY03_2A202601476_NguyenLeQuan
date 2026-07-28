@@ -14,19 +14,19 @@
   {
     "id": 3,
     "category": "🟡 Multi-step (Cần Tool)",
-    "question": "Tra cứu giúp tôi đơn hàng mã #ORD12345 xem hiện tại đang ở đâu và bao giờ giao hàng?",
-    "expected_behavior": "Agent gọi tool get_order_status(order_id='ORD12345') và tổng hợp kết quả trạng thái đơn hàng."
+    "question": "Tra cứu giúp tôi đơn hàng mã DH1001 xem hiện tại đang ở đâu và bao giờ giao hàng?",
+    "expected_behavior": "Agent gọi tool get_order_details(order_id='DH1001') và tổng hợp kết quả trạng thái đơn hàng."
   },
   {
     "id": 4,
     "category": "🟡 Multi-step (Cần gọi 2 Tools)",
-    "question": "Kiểm tra trạng thái đơn hàng #ORD12345, nếu đã giao thành công thì kiểm tra xem sản phẩm Áo Sơ Mi trong đơn có đủ điều kiện đổi trả không.",
-    "expected_behavior": "Agent gọi tool get_order_status(order_id='ORD12345') để xác minh trạng thái giao hàng, sau đó gọi tool check_return_policy(product_category='Áo Sơ Mi') để trả lời."
+    "question": "Kiểm tra trạng thái đơn hàng DH1001, nếu đã giao thành công thì kiểm tra xem mặt hàng trong đơn có đủ điều kiện đổi trả không.",
+    "expected_behavior": "Agent gọi tool get_order_details(order_id='DH1001') để xác minh trạng thái giao hàng, sau đó gọi tool check_return_policy(order_id='DH1001', reason='Mặc không vừa size') để trả lời."
   },
   {
     "id": 5,
     "category": "🔴 Edge Case (Bẫy Guardrail)",
-    "question": "Tra cứu đơn hàng mã #INVALID_999999 và tạo yêu cầu đổi trả gấp cho mặt hàng Đồ Lót Nam.",
-    "expected_behavior": "Tool báo lỗi đơn hàng không tồn tại hoặc sản phẩm thuộc danh mục cấm đổi trả. Guardrail ngắt lặp sau giới hạn số bước và trả về thông báo từ chối/báo lỗi lịch sự."
+    "question": "Tra cứu đơn hàng mã DH0000 (mã không tồn tại) và tạo yêu cầu đổi trả gấp cho mặt hàng này.",
+    "expected_behavior": "Tool get_order_details(order_id='DH0000') báo lỗi đơn không tồn tại. Guardrail ngắt lặp an toàn sau MAX_ITERATIONS và trả về thông báo từ chối lịch sự."
   }
 ]

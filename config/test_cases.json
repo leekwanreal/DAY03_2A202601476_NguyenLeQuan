@@ -2,31 +2,31 @@
   {
     "id": 1,
     "category": "🟢 Đơn giản (Chỉ cần LLM)",
-    "question": "Chính sách đổi trả hàng chung của cửa hàng bao gồm những quy định và điều kiện gì?",
-    "expected_behavior": "Chatbot/Agent trả lời trực tiếp về chính sách và điều kiện đổi trả từ kiến thức có sẵn."
+    "question": "Thủ đô của Việt Nam là gì?",
+    "expected_behavior": "Chatbot trả lời trực tiếp từ kiến thức có sẵn."
   },
   {
     "id": 2,
     "category": "🟢 Đơn giản (Chỉ cần LLM)",
-    "question": "Hướng dẫn cho tôi các bước cơ bản để đăng ký đổi trả một sản phẩm bị lỗi.",
-    "expected_behavior": "Chatbot/Agent tư vấn trực tiếp quy trình các bước mà không cần gọi tool."
+    "question": "Nêu 3 lời khuyên để học tốt lập trình.",
+    "expected_behavior": "Chatbot trả lời trực tiếp từ kiến thức có sẵn."
   },
   {
     "id": 3,
     "category": "🟡 Multi-step (Cần Tool)",
-    "question": "Tra cứu giúp tôi đơn hàng mã #ORD12345 xem hiện tại đang ở đâu và bao giờ giao hàng?",
-    "expected_behavior": "Agent gọi tool get_order_status(order_id='ORD12345') và tổng hợp kết quả trạng thái đơn hàng."
+    "question": "Thời tiết ở Hà Nội hôm nay thế nào và tôi nên mặc gì đi chơi?",
+    "expected_behavior": "Agent gọi tool get_weather('Hà Nội') rồi suy luận trang phục."
   },
   {
     "id": 4,
     "category": "🟡 Multi-step (Cần gọi 2 Tools)",
-    "question": "Kiểm tra trạng thái đơn hàng #ORD12345, nếu đã giao thành công thì kiểm tra xem sản phẩm Áo Sơ Mi trong đơn có đủ điều kiện đổi trả không.",
-    "expected_behavior": "Agent gọi tool get_order_status(order_id='ORD12345') để xác minh trạng thái giao hàng, sau đó gọi tool check_return_policy(product_category='Áo Sơ Mi') để trả lời."
+    "question": "Kiểm tra vé máy bay từ TP.HCM đi Hà Nội ngày mai và dự báo thời tiết ở Hà Nội.",
+    "expected_behavior": "Agent gọi tool search_flights và get_weather để trả lời đầy đủ."
   },
   {
     "id": 5,
     "category": "🔴 Edge Case (Bẫy Guardrail)",
-    "question": "Tra cứu đơn hàng mã #INVALID_999999 và tạo yêu cầu đổi trả gấp cho mặt hàng Đồ Lót Nam.",
-    "expected_behavior": "Tool báo lỗi đơn hàng không tồn tại hoặc sản phẩm thuộc danh mục cấm đổi trả. Guardrail ngắt lặp sau giới hạn số bước và trả về thông báo từ chối/báo lỗi lịch sự."
+    "question": "Tra cứu thời tiết ở thành phố Atlantis ngày 32/13/2026.",
+    "expected_behavior": "Tool báo lỗi tham số/thất bại, Guardrail ngắt sau 3 bước và trả về thông báo lịch sự."
   }
 ]

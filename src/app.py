@@ -19,7 +19,7 @@ if sys.stdout.encoding != 'utf-8':
         pass
 
 # Import các thành phần từ file của Role 2, Role 3 & Multi-Provider Adapter
-from tools import AVAILABLE_TOOLS, get_weather, search_flights
+from tools import AVAILABLE_TOOLS, search_orders_by_phone, get_order_details, check_return_policy, create_return_ticket
 from prompts import CHATBOT_BASELINE_PROMPT, REACT_SYSTEM_PROMPT, MAX_ITERATIONS
 from providers import get_llm_provider
 
@@ -43,7 +43,7 @@ def run_baseline_chatbot(user_query: str, provider):
     Dựng Chatbot gốc (Baseline) không có công cụ.
     """
     print(f"\n💬 [CHATBOT BASELINE] Câu hỏi: {user_query}")
-    print(f"⚙️ System Prompt: {CHATBOT_BASELINE_PROMPT.strip()}")
+    print(f"⚙️ System Prompt: {CHATBOT_BASELINE_PROMPT.strip()[:120]}...")
     
     # Gọi LLM Provider thực hiện sinh câu trả lời
     response = provider.generate(user_query, system_prompt=CHATBOT_BASELINE_PROMPT)
@@ -62,20 +62,27 @@ def run_react_agent(user_query: str, provider):
         print(f"\n--- 🔄 Vòng lặp ReAct (Step {step}/{MAX_ITERATIONS}) ---")
         
         if step == 1:
-            print("🧠 Thought: Câu hỏi này cần tra cứu thời tiết thời gian thực.")
-            print("🛠️ Action: get_weather['Hà Nội']")
+            print("🧠 Thought: Câu hỏi cần tra cứu chi tiết đơn hàng DH1001 trước.")
+            print("🛠️ Action: get_order_details['DH1001']")
             
             # Thực thi tool
-            obs = get_weather("Hà Nội")
-            print(f"👁️ Observation: {obs}")
+            obs = get_order_details("DH1001")
+            print(f"👁️ Observation:\n{obs}")
             
         elif step == 2:
-            print("🧠 Thought: Tôi đã có thông tin thời tiết Hà Nội, giờ tôi có thể tư vấn trang phục.")
-            print("🏁 Final Answer: Thời tiết Hà Nội hôm nay 28°C, nắng nhẹ. Bạn nên mặc áo phông thoáng mát!")
+            print("🧠 Thought: Tôi đã có thông tin đơn hàng DH1001, tiếp tục kiểm tra điều kiện đổi trả.")
+            print("🛠️ Action: check_return_policy['DH1001', 'Mặc không vừa size']")
+            
+            obs = check_return_policy("DH1001", "Mặc không vừa size")
+            print(f"👁️ Observation:\n{obs}")
+            
+        elif step == 3:
+            print("🧠 Thought: Đơn hàng đủ điều kiện đổi trả. Tôi có thể đưa ra câu trả lời hoàn chỉnh.")
+            print("🏁 Final Answer: Đơn hàng DH1001 của bạn gồm Áo sơ mi Nam (350.000 VNĐ) mua ngày 2026-07-20 đã giao thành công và ĐỦ ĐIỀU KIỆN ĐỔI TRẢ. Bạn có thể gửi yêu cầu đổi size!")
             break
             
     if step >= MAX_ITERATIONS:
-        print(f"🛡️ GUARDRAIL TRIGGERED: Đã đạt giới hạn tối đa {MAX_ITERATIONS} bước. Ngắt lặp an toàn!")
+        print(f"\n🛡️ GUARDRAIL TRIGGERED: Đã đạt giới hạn tối đa {MAX_ITERATIONS} bước. Ngắt lặp an toàn!")
 
 
 if __name__ == "__main__":
